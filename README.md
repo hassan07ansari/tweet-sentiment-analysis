@@ -2,80 +2,129 @@
 
 ## Project Overview
 
-This project explores sentiment classification of tweets using Natural Language Processing (NLP) and machine learning. The objective is to classify tweets into three sentiment categories: positive, negative, and neutral.
+This project explores sentiment classification of tweets using Natural Language Processing (NLP), traditional machine learning, and deep learning.
 
-The project uses text preprocessing and CountVectorizer to convert text into numerical features. Multiple machine learning classifiers are being evaluated to compare their performance on the same sentiment classification task.
+The objective is to classify tweets into three sentiment categories: **positive, negative, and neutral**.
+
+The project compares multiple classification algorithms using text features extracted with CountVectorizer and explores Word2Vec embeddings with an LSTM network for sequence-based sentiment classification.
 
 ## Dataset
 
-* Total records: 27,480 tweets
-* Input text: `text`
-* Target column: `sentiment`
-* Processed text: `clean_text`
-* Classification type: Multiclass classification
-* Classes: Positive, Negative, Neutral
+- Total records in the original dataset: 27,480 tweets
+- Records after cleaning empty processed text: 27,476 tweets
+- Input text column: `text`
+- Target column: `sentiment`
+- Processed text column: `clean_text`
+- Classification type: Multiclass classification
+- Classes: Positive, Negative, Neutral
+
+The data was split into training and testing sets using a stratified 50/50 split with `random_state=42`.
+
+- Training samples: 13,738
+- Testing samples: 13,738
 
 ## Text Preprocessing and Feature Extraction
 
-The project includes text cleaning and preprocessing to prepare tweets for classification.
+Text preprocessing was performed to prepare tweets for sentiment classification.
 
-CountVectorizer is used to convert the cleaned text into a sparse bag-of-words representation. The vectorizer is fitted on the training data and then applied to the test data to avoid data leakage during feature extraction.
+**CountVectorizer** was used to convert cleaned tweets into numerical bag-of-words features for the traditional machine learning experiments. The vectorizer was fitted on the training data and then applied to the test data to avoid data leakage.
+
+**TruncatedSVD** was used with KNN to reduce the dimensionality of the text feature space.
+
+For the deep learning experiment, **Word2Vec** was used to learn 100-dimensional word embeddings from the training text. These embeddings were supplied as sequences to an LSTM network.
 
 ## Machine Learning Models
 
-The following classifiers have been explored:
+The following models have been implemented and evaluated:
 
-* Logistic Regression
-* K-Nearest Neighbors (KNN)
-* Multinomial Naive Bayes
-* Decision Tree Classifier
-* Random Forest Classifier
-* Linear Support Vector Machine (Linear SVM)
+- Logistic Regression
+- Multinomial Naive Bayes
+- Linear SVC (Support Vector Classification)
+- K-Nearest Neighbors (KNN)
+- Decision Tree Classifier
+- Random Forest Classifier
+- XGBoost
 
-TruncatedSVD was also used with KNN to reduce the dimensionality of the text features.
+## Deep Learning Model
 
-## Initial Results
+### Word2Vec + LSTM
 
-The following results are from the completed experiments recorded so far.
+A Word2Vec model was trained on the training tweets to generate 100-dimensional word embeddings. The resulting word vectors were arranged into sequences and passed to an LSTM model for three-class sentiment classification.
 
-| Model                   | Accuracy | Macro F1-score |
-| ----------------------- | -------: | -------------: |
-| Logistic Regression     |   68.14% |           0.68 |
-| Linear SVM              |   65.82% |           0.66 |
-| Multinomial Naive Bayes |   64.40% |           0.64 |
-| Decision Tree           |   64.00% |           0.64 |
-| KNN with TruncatedSVD   |   47.01% |           0.46 |
+The LSTM architecture consists of:
 
-Random Forest evaluation and additional model experiments remain in progress.
+- Masking layer for zero-padding
+- LSTM layer with 64 units
+- Dense layer with 32 units and ReLU activation
+- Dropout layer with a rate of 0.3
+- Softmax output layer with three classes
 
-## Evaluation
+The model was trained using the Adam optimizer and sparse categorical crossentropy loss.
 
-Model performance is evaluated using classification accuracy, precision, recall, F1-score, classification reports, and confusion matrices.
+## Model Performance Comparison
 
-Macro F1-score is useful for comparing performance across all three sentiment classes.
+The table below summarizes the recorded test-set results.
+
+| Model | Test Accuracy | Macro F1-score |
+|---|---:|---:|
+| Logistic Regression | 68.30% | 0.68 |
+| Linear SVC | 65.64% | 0.66 |
+| XGBoost | 65.05% | 0.64 |
+| Multinomial Naive Bayes | 63.87% | 0.64 |
+| Decision Tree | 63.43% | 0.63 |
+| Word2Vec + LSTM | 60.58% | 0.60 |
+| Random Forest | 58.71% | 0.54 |
+| KNN with TruncatedSVD | 48.08% | 0.47 |
+
+*Macro F1-scores are rounded to two decimal places.*
+
+These results reflect the current experiments. Logistic Regression achieved the highest recorded test accuracy among the evaluated models.
+
+## Evaluation Metrics
+
+Model performance was evaluated using:
+
+- Accuracy
+- Precision
+- Recall
+- F1-score
+- Macro and weighted averages
+- Classification reports
+- Confusion matrices
+
+Macro F1-score is useful for comparing performance across the three sentiment classes, while confusion matrices help identify which sentiments are frequently misclassified.
 
 ## Technologies Used
 
-* Python
-* Pandas
-* NumPy
-* Scikit-learn
-* NLP text preprocessing
-* CountVectorizer
-* TruncatedSVD
-* Machine Learning Classification
+- Python
+- Pandas and NumPy
+- Scikit-learn
+- NLTK
+- Gensim (Word2Vec)
+- TensorFlow / Keras
+- CountVectorizer
+- TruncatedSVD
+- XGBoost
+- Jupyter Notebook
+
+## Key Observations
+
+- Logistic Regression achieved the highest test accuracy among the models evaluated so far.
+- Linear SVC and XGBoost also produced competitive results.
+- KNN achieved the lowest test accuracy among these experiments.
+- Random Forest showed differences between precision and recall across sentiment classes.
+- Word2Vec + LSTM provided a comparison between traditional machine learning and sequence-based deep learning.
+- Evaluating class-level metrics alongside accuracy helps provide a more complete picture of model performance.
 
 ## Planned Improvements
 
-* Complete Random Forest evaluation
-* Experiment with XGBoost
-* Compare additional feature extraction techniques, including TF-IDF and Word2Vec
-* Develop a Word2Vec + LSTM model
-* Explore CBOW and other embedding approaches
-* Implement a Transformer-based sentiment classifier
-* Compare models using consistent evaluation metrics
-* Analyze model errors and improve classification performance
+- Explore transformer architectures and fine-tune a pretrained BERT-family model in a separate experiment.
+- Investigate model errors using confusion matrices and per-class metrics.
+- Explore hyperparameter tuning and methods to improve generalization.
+- Compare traditional machine learning, deep learning, and transformer-based approaches.
 
 ## Project Status
 
-The initial CountVectorizer-based machine learning experiments have been developed, and model comparison is ongoing. Further experiments with feature representations, deep learning, and transformer architectures are planned.
+The initial machine learning experiments and the Word2Vec + LSTM experiment have been completed. Model comparison is documented using test accuracy and macro F1-score.
+
+Further work will focus on interpreting model performance, understanding classification errors, and exploring transformer-based sentiment analysis.
